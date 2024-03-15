@@ -1,0 +1,131 @@
+﻿@page "/edit"
+@inject DirectReportsApp.Context.EmployeeDbContext DB
+@using DirectReportsApp.Data
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>Employee</h4>
+<hr />
+@if (Employee is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Employee" OnValidSubmit="UpdateEmployee" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="Employee.Id" value="@Employee.Id" />
+                <div class="mb-3">
+                    <label for="firstname" class="form-label">First Name:</label>
+                    <InputText id="firstname" @bind-Value="Employee.FirstName" class="form-control" />
+                    <ValidationMessage For="() => Employee.FirstName" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="lastname" class="form-label">Last Name:</label>
+                    <InputText id="lastname" @bind-Value="Employee.LastName" class="form-control" />
+                    <ValidationMessage For="() => Employee.LastName" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="address" class="form-label">Address:</label>
+                    <InputText id="address" @bind-Value="Employee.Address" class="form-control" />
+                    <ValidationMessage For="() => Employee.Address" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="city" class="form-label">City:</label>
+                    <InputText id="city" @bind-Value="Employee.City" class="form-control" />
+                    <ValidationMessage For="() => Employee.City" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="state" class="form-label">State:</label>
+                    <InputText id="state" @bind-Value="Employee.State" class="form-control" />
+                    <ValidationMessage For="() => Employee.State" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="country" class="form-label">Country:</label>
+                    <InputText id="country" @bind-Value="Employee.Country" class="form-control" />
+                    <ValidationMessage For="() => Employee.Country" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="jobtitle" class="form-label">Job Title:</label>
+                    <InputText id="jobtitle" @bind-Value="Employee.JobTitle" class="form-control" />
+                    <ValidationMessage For="() => Employee.JobTitle" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="jobdepartment" class="form-label">Job Department:</label>
+                    <InputText id="jobdepartment" @bind-Value="Employee.JobDepartment" class="form-control" />
+                    <ValidationMessage For="() => Employee.JobDepartment" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="managerfirstname" class="form-label">Manager First Name:</label>
+                    <InputText id="managerfirstname" @bind-Value="Employee.ManagerFirstName" class="form-control" />
+                    <ValidationMessage For="() => Employee.ManagerFirstName" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="managerlastname" class="form-label">Manager Last Name:</label>
+                    <InputText id="managerlastname" @bind-Value="Employee.ManagerLastName" class="form-control" />
+                    <ValidationMessage For="() => Employee.ManagerLastName" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    public Employee? Employee { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Employee ??= await DB.Employees.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Employee is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateEmployee()
+    {
+        DB.Attach(Employee!).State = EntityState.Modified;
+
+        try
+        {
+            await DB.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!EmployeeExists(Employee!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/");
+    }
+
+    bool EmployeeExists(int id)
+    {
+        return DB.Employees.Any(e => e.Id == id);
+    }
+}

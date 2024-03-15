@@ -1,0 +1,63 @@
+﻿@page "/details"
+@inject DirectReportsApp.Context.EmployeeDbContext DB
+@using DirectReportsApp.Data
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Employee</h4>
+    <hr />
+    @if (employee is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">First Name</dt>
+            <dd class="col-sm-10">@employee.FirstName</dd>
+            <dt class="col-sm-2">Last Name</dt>
+            <dd class="col-sm-10">@employee.LastName</dd>
+            <dt class="col-sm-2">Address</dt>
+            <dd class="col-sm-10">@employee.Address</dd>
+            <dt class="col-sm-2">City</dt>
+            <dd class="col-sm-10">@employee.City</dd>
+            <dt class="col-sm-2">State</dt>
+            <dd class="col-sm-10">@employee.State</dd>
+            <dt class="col-sm-2">Country</dt>
+            <dd class="col-sm-10">@employee.Country</dd>
+            <dt class="col-sm-2">Job Title</dt>
+            <dd class="col-sm-10">@employee.JobTitle</dd>
+            <dt class="col-sm-2">Job Department</dt>
+            <dd class="col-sm-10">@employee.JobDepartment</dd>
+            <dt class="col-sm-2">Manager First Name</dt>
+            <dd class="col-sm-10">@employee.ManagerFirstName</dd>
+            <dt class="col-sm-2">Manager Last Name</dt>
+            <dd class="col-sm-10">@employee.ManagerLastName</dd>
+        </dl>
+        <div>
+            <a href="@($"/edit?id={employee.Id}")">Edit</a> |
+            <a href="@($"/")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Employee? employee;
+
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        employee = await DB.Employees.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (employee is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

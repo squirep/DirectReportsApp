@@ -1,0 +1,54 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject DirectReportsApp.Context.EmployeeDbContext DB
+@inject NavigationManager NavigationManager
+@using DirectReportsApp.Data
+@rendermode InteractiveServer
+
+<PageTitle>Direct Reports</PageTitle>
+
+<h1>My Direct Reports</h1>
+
+<p>
+    <button class="btn btn-primary" onclick="@OnClick">Create New Employee</button>
+</p>
+
+<div class="page-size-chooser">
+    Items per page:
+    <select @bind="@pagination.ItemsPerPage">
+        <option>5</option>
+        <option>10</option>
+        <option>20</option>
+        <option>50</option>
+    </select>
+</div>
+
+<QuickGrid Class="table" Items="DB.Employees" Pagination="pagination">
+    <PropertyColumn Property="employee => employee.FirstName" Title="First Name" Sortable="true" />
+    <PropertyColumn Property="employee => employee.LastName" Title="Last Name" Sortable="true" />
+    <PropertyColumn Property="employee => employee.Address" Sortable="true" />
+    <PropertyColumn Property="employee => employee.City" Sortable="true" />
+    <PropertyColumn Property="employee => employee.State" Sortable="true" />
+    <PropertyColumn Property="employee => employee.Country" Sortable="true" />
+    <PropertyColumn Property="employee => employee.JobTitle" Title="Job Title" Sortable="true" />
+    <PropertyColumn Property="employee => employee.JobDepartment" Title="Job Department" Sortable="true" />
+    <PropertyColumn Property="employee => employee.ManagerFirstName" Title="Manager First Name" Sortable="true" />
+    <PropertyColumn Property="employee => employee.ManagerLastName" Title="Manager Last Name" Sortable="true" />
+
+    <TemplateColumn Context="employee">
+        <a href="@($"/edit?id={employee.Id}")">Edit</a> |
+        <a href="@($"/details?id={employee.Id}")">Details</a> |
+        <a href="@($"/delete?id={employee.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+<Paginator State="pagination" />
+
+@code{
+    PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
+
+    private void OnClick()
+    {
+        NavigationManager.NavigateTo("/create");
+    }
+}
